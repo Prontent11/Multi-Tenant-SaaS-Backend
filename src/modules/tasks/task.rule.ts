@@ -1,4 +1,4 @@
-import { TaskStatus } from '@prisma/client';
+import { TaskStatus } from "../../../prisma/generated/prisma";
 
 export function isValidStatusTransition(
   current: TaskStatus,

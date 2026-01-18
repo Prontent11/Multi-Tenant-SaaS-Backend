@@ -1,8 +1,8 @@
 import { Response } from 'express';
-import { AuthRequest } from '../../middleware/auth.middleware';
+import { AuthRequest } from '../../middleware/authMiddleware';
 import { createTask, getTasksForUser } from './task.service';
 import { prisma } from '../../config/prisma';
-import { isValidStatusTransition } from './task.rules';
+import { isValidStatusTransition } from './task.rule';
 
 export async function create(req: AuthRequest, res: Response) {
   const { title, description, priority, dueDate, assignedToId } = req.body;
