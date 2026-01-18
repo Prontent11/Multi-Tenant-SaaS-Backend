@@ -115,6 +115,16 @@ exports.Prisma.OrganizationAdminScalarFieldEnum = {
   organizationId: 'organizationId'
 };
 
+exports.Prisma.UserScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  passwordHash: 'passwordHash',
+  isActive: 'isActive',
+  role: 'role',
+  createdAt: 'createdAt',
+  organizationId: 'organizationId'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -133,6 +143,17 @@ exports.Prisma.OrganizationAdminOrderByRelevanceFieldEnum = {
   email: 'email',
   passwordHash: 'passwordHash'
 };
+
+exports.Prisma.UserOrderByRelevanceFieldEnum = {
+  email: 'email',
+  passwordHash: 'passwordHash'
+};
+exports.OrgRole = exports.$Enums.OrgRole = {
+  ADMIN: 'ADMIN',
+  MANAGER: 'MANAGER',
+  USER: 'USER'
+};
+
 exports.OrgStatus = exports.$Enums.OrgStatus = {
   ACTIVE: 'ACTIVE',
   DISABLED: 'DISABLED'
@@ -141,7 +162,8 @@ exports.OrgStatus = exports.$Enums.OrgStatus = {
 exports.Prisma.ModelName = {
   SuperAdmin: 'SuperAdmin',
   Organization: 'Organization',
-  OrganizationAdmin: 'OrganizationAdmin'
+  OrganizationAdmin: 'OrganizationAdmin',
+  User: 'User'
 };
 /**
  * Create the Client
@@ -151,10 +173,10 @@ const config = {
   "clientVersion": "7.2.0",
   "engineVersion": "0c8ef2ce45c83248ab3df073180d5eda9e8be7a3",
   "activeProvider": "mysql",
-  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"./generated/prisma\"\n}\n\ndatasource db {\n  provider = \"mysql\"\n}\n\nmodel SuperAdmin {\n  id           Int      @id @default(autoincrement())\n  email        String   @unique\n  passwordHash String\n  isActive     Boolean  @default(true)\n  createdAt    DateTime @default(now())\n}\n\nmodel Organization {\n  id        Int                 @id @default(autoincrement())\n  name      String\n  status    OrgStatus           @default(ACTIVE)\n  createdAt DateTime            @default(now())\n  admins    OrganizationAdmin[]\n}\n\nmodel OrganizationAdmin {\n  id             Int          @id @default(autoincrement())\n  email          String       @unique\n  passwordHash   String\n  isActive       Boolean      @default(true)\n  organizationId Int\n  organization   Organization @relation(fields: [organizationId], references: [id])\n\n  @@index([organizationId], map: \"OrganizationAdmin_organizationId_fkey\")\n}\n\nenum OrgStatus {\n  ACTIVE\n  DISABLED\n}\n"
+  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"./generated/prisma\"\n}\n\ndatasource db {\n  provider = \"mysql\"\n}\n\nmodel SuperAdmin {\n  id           Int      @id @default(autoincrement())\n  email        String   @unique\n  passwordHash String\n  isActive     Boolean  @default(true)\n  createdAt    DateTime @default(now())\n}\n\nmodel Organization {\n  id        Int                 @id @default(autoincrement())\n  name      String\n  status    OrgStatus           @default(ACTIVE)\n  createdAt DateTime            @default(now())\n  users     User[]\n  admins    OrganizationAdmin[]\n}\n\nmodel OrganizationAdmin {\n  id             Int          @id @default(autoincrement())\n  email          String       @unique\n  passwordHash   String\n  isActive       Boolean      @default(true)\n  organizationId Int\n  organization   Organization @relation(fields: [organizationId], references: [id])\n\n  @@index([organizationId], map: \"OrganizationAdmin_organizationId_fkey\")\n}\n\nmodel User {\n  id             Int          @id @default(autoincrement())\n  email          String       @unique\n  passwordHash   String\n  isActive       Boolean      @default(true)\n  role           OrgRole\n  createdAt      DateTime     @default(now())\n  organizationId Int\n  organization   Organization @relation(fields: [organizationId], references: [id])\n}\n\nenum OrgRole {\n  ADMIN\n  MANAGER\n  USER\n}\n\nenum OrgStatus {\n  ACTIVE\n  DISABLED\n}\n"
 }
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"SuperAdmin\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"passwordHash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isActive\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"Organization\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"OrgStatus\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"admins\",\"kind\":\"object\",\"type\":\"OrganizationAdmin\",\"relationName\":\"OrganizationToOrganizationAdmin\"}],\"dbName\":null},\"OrganizationAdmin\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"passwordHash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isActive\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"organizationId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"organization\",\"kind\":\"object\",\"type\":\"Organization\",\"relationName\":\"OrganizationToOrganizationAdmin\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"SuperAdmin\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"passwordHash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isActive\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"Organization\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"OrgStatus\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"users\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"OrganizationToUser\"},{\"name\":\"admins\",\"kind\":\"object\",\"type\":\"OrganizationAdmin\",\"relationName\":\"OrganizationToOrganizationAdmin\"}],\"dbName\":null},\"OrganizationAdmin\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"passwordHash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isActive\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"organizationId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"organization\",\"kind\":\"object\",\"type\":\"Organization\",\"relationName\":\"OrganizationToOrganizationAdmin\"}],\"dbName\":null},\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"passwordHash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isActive\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"role\",\"kind\":\"enum\",\"type\":\"OrgRole\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"organizationId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"organization\",\"kind\":\"object\",\"type\":\"Organization\",\"relationName\":\"OrganizationToUser\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.compilerWasm = {
   getRuntime: async () => require('./query_compiler_bg.js'),

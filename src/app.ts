@@ -1,7 +1,8 @@
 import superAdminRoutes from './modules/superAdmin/superAdmin.routes';
 import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
-
+import orgAuthRoutes from './modules/orgAuth/orgAuth.routes'
+import userRoutes from './modules/users/user.routes'
 const app: Application = express();
 
 //Global Middleware
@@ -16,6 +17,9 @@ app.get('/health', (_req: Request, res: Response) => {
 // Super Admin Routes 
 
 app.use('/api/super-admin', superAdminRoutes);
+app.use('/api/org', orgAuthRoutes);
+app.use('/api/org/users', userRoutes);
+
 
 
 // 404 Request

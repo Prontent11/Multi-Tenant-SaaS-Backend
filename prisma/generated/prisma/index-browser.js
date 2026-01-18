@@ -143,6 +143,16 @@ exports.Prisma.OrganizationAdminScalarFieldEnum = {
   organizationId: 'organizationId'
 };
 
+exports.Prisma.UserScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  passwordHash: 'passwordHash',
+  isActive: 'isActive',
+  role: 'role',
+  createdAt: 'createdAt',
+  organizationId: 'organizationId'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -161,15 +171,27 @@ exports.Prisma.OrganizationAdminOrderByRelevanceFieldEnum = {
   email: 'email',
   passwordHash: 'passwordHash'
 };
+
+exports.Prisma.UserOrderByRelevanceFieldEnum = {
+  email: 'email',
+  passwordHash: 'passwordHash'
+};
 exports.OrgStatus = exports.$Enums.OrgStatus = {
   ACTIVE: 'ACTIVE',
   DISABLED: 'DISABLED'
 };
 
+exports.OrgRole = exports.$Enums.OrgRole = {
+  ADMIN: 'ADMIN',
+  MANAGER: 'MANAGER',
+  USER: 'USER'
+};
+
 exports.Prisma.ModelName = {
   SuperAdmin: 'SuperAdmin',
   Organization: 'Organization',
-  OrganizationAdmin: 'OrganizationAdmin'
+  OrganizationAdmin: 'OrganizationAdmin',
+  User: 'User'
 };
 
 /**
