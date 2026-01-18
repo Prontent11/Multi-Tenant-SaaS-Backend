@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model SuperAdmin {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+}
+
+model Organization {
+  id        Int       @id @default(autoincrement())
+  name      String
+  status    OrgStatus @default(ACTIVE)
+  createdAt DateTime  @default(now())
+
+  admins OrganizationAdmin[]
+}
+
+model OrganizationAdmin {
+  id           Int     @id @default(autoincrement())
+  email        String  @unique
+  passwordHash String
+  isActive     Boolean @default(true)
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId Int
+}
+
+enum OrgStatus {
+  ACTIVE
+  DISABLED
+}
