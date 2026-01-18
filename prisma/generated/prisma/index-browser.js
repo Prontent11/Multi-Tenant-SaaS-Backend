@@ -135,14 +135,6 @@ exports.Prisma.OrganizationScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
-exports.Prisma.OrganizationAdminScalarFieldEnum = {
-  id: 'id',
-  email: 'email',
-  passwordHash: 'passwordHash',
-  isActive: 'isActive',
-  organizationId: 'organizationId'
-};
-
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
@@ -151,6 +143,20 @@ exports.Prisma.UserScalarFieldEnum = {
   role: 'role',
   createdAt: 'createdAt',
   organizationId: 'organizationId'
+};
+
+exports.Prisma.TaskScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  priority: 'priority',
+  status: 'status',
+  dueDate: 'dueDate',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  organizationId: 'organizationId',
+  createdById: 'createdById',
+  assignedToId: 'assignedToId'
 };
 
 exports.Prisma.SortOrder = {
@@ -167,14 +173,19 @@ exports.Prisma.OrganizationOrderByRelevanceFieldEnum = {
   name: 'name'
 };
 
-exports.Prisma.OrganizationAdminOrderByRelevanceFieldEnum = {
+exports.Prisma.UserOrderByRelevanceFieldEnum = {
   email: 'email',
   passwordHash: 'passwordHash'
 };
 
-exports.Prisma.UserOrderByRelevanceFieldEnum = {
-  email: 'email',
-  passwordHash: 'passwordHash'
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+
+exports.Prisma.TaskOrderByRelevanceFieldEnum = {
+  title: 'title',
+  description: 'description'
 };
 exports.OrgStatus = exports.$Enums.OrgStatus = {
   ACTIVE: 'ACTIVE',
@@ -187,11 +198,24 @@ exports.OrgRole = exports.$Enums.OrgRole = {
   USER: 'USER'
 };
 
+exports.TaskPriority = exports.$Enums.TaskPriority = {
+  LOW: 'LOW',
+  MEDIUM: 'MEDIUM',
+  HIGH: 'HIGH'
+};
+
+exports.TaskStatus = exports.$Enums.TaskStatus = {
+  OPEN: 'OPEN',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  REOPENED: 'REOPENED'
+};
+
 exports.Prisma.ModelName = {
   SuperAdmin: 'SuperAdmin',
   Organization: 'Organization',
-  OrganizationAdmin: 'OrganizationAdmin',
-  User: 'User'
+  User: 'User',
+  Task: 'Task'
 };
 
 /**

@@ -107,14 +107,6 @@ exports.Prisma.OrganizationScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
-exports.Prisma.OrganizationAdminScalarFieldEnum = {
-  id: 'id',
-  email: 'email',
-  passwordHash: 'passwordHash',
-  isActive: 'isActive',
-  organizationId: 'organizationId'
-};
-
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
@@ -123,6 +115,20 @@ exports.Prisma.UserScalarFieldEnum = {
   role: 'role',
   createdAt: 'createdAt',
   organizationId: 'organizationId'
+};
+
+exports.Prisma.TaskScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  priority: 'priority',
+  status: 'status',
+  dueDate: 'dueDate',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  organizationId: 'organizationId',
+  createdById: 'createdById',
+  assignedToId: 'assignedToId'
 };
 
 exports.Prisma.SortOrder = {
@@ -139,14 +145,19 @@ exports.Prisma.OrganizationOrderByRelevanceFieldEnum = {
   name: 'name'
 };
 
-exports.Prisma.OrganizationAdminOrderByRelevanceFieldEnum = {
+exports.Prisma.UserOrderByRelevanceFieldEnum = {
   email: 'email',
   passwordHash: 'passwordHash'
 };
 
-exports.Prisma.UserOrderByRelevanceFieldEnum = {
-  email: 'email',
-  passwordHash: 'passwordHash'
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+
+exports.Prisma.TaskOrderByRelevanceFieldEnum = {
+  title: 'title',
+  description: 'description'
 };
 exports.OrgRole = exports.$Enums.OrgRole = {
   ADMIN: 'ADMIN',
@@ -159,11 +170,24 @@ exports.OrgStatus = exports.$Enums.OrgStatus = {
   DISABLED: 'DISABLED'
 };
 
+exports.TaskStatus = exports.$Enums.TaskStatus = {
+  OPEN: 'OPEN',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  REOPENED: 'REOPENED'
+};
+
+exports.TaskPriority = exports.$Enums.TaskPriority = {
+  LOW: 'LOW',
+  MEDIUM: 'MEDIUM',
+  HIGH: 'HIGH'
+};
+
 exports.Prisma.ModelName = {
   SuperAdmin: 'SuperAdmin',
   Organization: 'Organization',
-  OrganizationAdmin: 'OrganizationAdmin',
-  User: 'User'
+  User: 'User',
+  Task: 'Task'
 };
 /**
  * Create the Client
@@ -173,10 +197,10 @@ const config = {
   "clientVersion": "7.2.0",
   "engineVersion": "0c8ef2ce45c83248ab3df073180d5eda9e8be7a3",
   "activeProvider": "mysql",
-  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"./generated/prisma\"\n}\n\ndatasource db {\n  provider = \"mysql\"\n}\n\nmodel SuperAdmin {\n  id           Int      @id @default(autoincrement())\n  email        String   @unique\n  passwordHash String\n  isActive     Boolean  @default(true)\n  createdAt    DateTime @default(now())\n}\n\nmodel Organization {\n  id        Int                 @id @default(autoincrement())\n  name      String\n  status    OrgStatus           @default(ACTIVE)\n  createdAt DateTime            @default(now())\n  users     User[]\n  admins    OrganizationAdmin[]\n}\n\nmodel OrganizationAdmin {\n  id             Int          @id @default(autoincrement())\n  email          String       @unique\n  passwordHash   String\n  isActive       Boolean      @default(true)\n  organizationId Int\n  organization   Organization @relation(fields: [organizationId], references: [id])\n\n  @@index([organizationId], map: \"OrganizationAdmin_organizationId_fkey\")\n}\n\nmodel User {\n  id             Int          @id @default(autoincrement())\n  email          String       @unique\n  passwordHash   String\n  isActive       Boolean      @default(true)\n  role           OrgRole\n  createdAt      DateTime     @default(now())\n  organizationId Int\n  organization   Organization @relation(fields: [organizationId], references: [id])\n}\n\nenum OrgRole {\n  ADMIN\n  MANAGER\n  USER\n}\n\nenum OrgStatus {\n  ACTIVE\n  DISABLED\n}\n"
+  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"./generated/prisma\"\n}\n\ndatasource db {\n  provider = \"mysql\"\n}\n\nmodel SuperAdmin {\n  id           Int      @id @default(autoincrement())\n  email        String   @unique\n  passwordHash String\n  isActive     Boolean  @default(true)\n  createdAt    DateTime @default(now())\n}\n\nmodel Organization {\n  id        Int       @id @default(autoincrement())\n  name      String\n  status    OrgStatus @default(ACTIVE)\n  createdAt DateTime  @default(now())\n\n  users User[]\n  tasks Task[]\n}\n\nmodel User {\n  id           Int      @id @default(autoincrement())\n  email        String   @unique\n  passwordHash String\n  isActive     Boolean  @default(true)\n  role         OrgRole\n  createdAt    DateTime @default(now())\n\n  organizationId Int\n  organization   Organization @relation(fields: [organizationId], references: [id])\n\n  createdTasks  Task[] @relation(\"CreatedTasks\")\n  assignedTasks Task[] @relation(\"AssignedTasks\")\n}\n\nmodel Task {\n  id          Int          @id @default(autoincrement())\n  title       String\n  description String?\n  priority    TaskPriority\n  status      TaskStatus   @default(OPEN)\n  dueDate     DateTime\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  organizationId Int\n  organization   Organization @relation(fields: [organizationId], references: [id])\n\n  createdById Int\n  createdBy   User @relation(\"CreatedTasks\", fields: [createdById], references: [id])\n\n  assignedToId Int\n  assignedTo   User @relation(\"AssignedTasks\", fields: [assignedToId], references: [id])\n}\n\nenum OrgRole {\n  ADMIN\n  MANAGER\n  USER\n}\n\nenum OrgStatus {\n  ACTIVE\n  DISABLED\n}\n\nenum TaskStatus {\n  OPEN\n  IN_PROGRESS\n  COMPLETED\n  REOPENED\n}\n\nenum TaskPriority {\n  LOW\n  MEDIUM\n  HIGH\n}\n"
 }
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"SuperAdmin\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"passwordHash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isActive\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"Organization\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"OrgStatus\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"users\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"OrganizationToUser\"},{\"name\":\"admins\",\"kind\":\"object\",\"type\":\"OrganizationAdmin\",\"relationName\":\"OrganizationToOrganizationAdmin\"}],\"dbName\":null},\"OrganizationAdmin\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"passwordHash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isActive\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"organizationId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"organization\",\"kind\":\"object\",\"type\":\"Organization\",\"relationName\":\"OrganizationToOrganizationAdmin\"}],\"dbName\":null},\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"passwordHash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isActive\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"role\",\"kind\":\"enum\",\"type\":\"OrgRole\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"organizationId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"organization\",\"kind\":\"object\",\"type\":\"Organization\",\"relationName\":\"OrganizationToUser\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"SuperAdmin\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"passwordHash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isActive\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"Organization\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"OrgStatus\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"users\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"OrganizationToUser\"},{\"name\":\"tasks\",\"kind\":\"object\",\"type\":\"Task\",\"relationName\":\"OrganizationToTask\"}],\"dbName\":null},\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"passwordHash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isActive\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"role\",\"kind\":\"enum\",\"type\":\"OrgRole\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"organizationId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"organization\",\"kind\":\"object\",\"type\":\"Organization\",\"relationName\":\"OrganizationToUser\"},{\"name\":\"createdTasks\",\"kind\":\"object\",\"type\":\"Task\",\"relationName\":\"CreatedTasks\"},{\"name\":\"assignedTasks\",\"kind\":\"object\",\"type\":\"Task\",\"relationName\":\"AssignedTasks\"}],\"dbName\":null},\"Task\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"priority\",\"kind\":\"enum\",\"type\":\"TaskPriority\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"TaskStatus\"},{\"name\":\"dueDate\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"organizationId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"organization\",\"kind\":\"object\",\"type\":\"Organization\",\"relationName\":\"OrganizationToTask\"},{\"name\":\"createdById\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"createdBy\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"CreatedTasks\"},{\"name\":\"assignedToId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"assignedTo\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"AssignedTasks\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.compilerWasm = {
   getRuntime: async () => require('./query_compiler_bg.js'),

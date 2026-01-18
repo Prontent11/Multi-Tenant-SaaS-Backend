@@ -3,6 +3,7 @@ import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import orgAuthRoutes from './modules/orgAuth/orgAuth.routes'
 import userRoutes from './modules/users/user.routes'
+import taskRoutes from './modules/tasks/task.routes'
 const app: Application = express();
 
 //Global Middleware
@@ -19,7 +20,7 @@ app.get('/health', (_req: Request, res: Response) => {
 app.use('/api/super-admin', superAdminRoutes);
 app.use('/api/org', orgAuthRoutes);
 app.use('/api/org/users', userRoutes);
-
+app.use('/api/org/tasks', taskRoutes);
 
 
 // 404 Request
