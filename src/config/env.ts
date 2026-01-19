@@ -9,3 +9,5 @@ export const  DATABASE_PORT=process.env.DATABASE_PORT
 export const  DATABASE_USER=process.env.DATABASE_USER
 export const  DATABASE_PASSWORD=process.env.DATABASE_PASSWORD
 export const  DATABASE_NAME=process.env.DATABASE_NAME
+export const EMAIL_USER=process.env.EMAIL_USER
+export const EMAIL_PASS=process.env.EMAIL_PASS

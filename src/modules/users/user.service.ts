@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import { prisma } from '../../config/prisma';
+import { AuthRequest } from '../../middleware/authMiddleware';
 
 export async function createUser(
   organizationId: number,
@@ -15,6 +16,20 @@ export async function createUser(
       passwordHash,
       role,
       organizationId,
+    },
+  });
+}
+
+export async function listUser(organizationId: number) {
+return await prisma.user.findMany({
+    where: {
+      organizationId: organizationId,
+      isActive: true,
+    },
+    select: {
+      id: true,
+      email: true,
+      role: true,
     },
   });
 }

@@ -1,65 +1,88 @@
 import { Response } from 'express';
 import { AuthRequest } from '../../middleware/authMiddleware';
-import { createTask, getTasksForUser } from './task.service';
-import { prisma } from '../../config/prisma';
-import { isValidStatusTransition } from './task.rule';
+import * as taskService from './task.service';
 
-export async function create(req: AuthRequest, res: Response) {
-  const { title, description, priority, dueDate, assignedToId } = req.body;
-
-  if (!['ADMIN', 'MANAGER'].includes(req.user.role)) {
-    return res.status(403).json({ message: 'Not allowed' });
-  }
-
-  const task = await createTask({
-    title,
-    description,
-    priority,
-    dueDate: new Date(dueDate),
-    organizationId: req.user.organizationId,
-    createdById: req.user.id,
-    assignedToId,
-  });
-
-  res.status(201).json(task);
-}
-
-export async function list(req: AuthRequest, res: Response) {
-  const tasks = await getTasksForUser(req.user);
+export async function listTasks(req: AuthRequest, res: Response) {
+  const tasks = await taskService.listTasks(req.user);
   res.status(200).json(tasks);
 }
 
-export async function updateStatus(req: AuthRequest, res: Response) {
-  const taskId = Number(req.params.id);
-  const { status } = req.body;
 
-  const task = await prisma.task.findUnique({ where: { id: taskId } });
-  if (!task || task.organizationId !== req.user.organizationId) {
-    return res.status(404).json({ message: 'Task not found' });
+export async function createTask(req: AuthRequest, res: Response) {
+  try {
+    const task = await taskService.createTask(req.user, req.body);
+    res.status(201).json(task);
+  } catch (err: any) {
+    if (err.message === 'FORBIDDEN') {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+    if (err.message === 'INVALID_ASSIGNEE') {
+      return res.status(400).json({ message: 'Invalid assignee' });
+    }
+    throw err;
   }
+}
 
-  if (!isValidStatusTransition(task.status, status)) {
-    return res.status(403).json({ message: 'Invalid status transition' });
+
+export async function updateTaskStatus(req: AuthRequest, res: Response) {
+  try {
+    const taskId = Number(req.params.id);
+    const { status } = req.body;
+
+    const updated = await taskService.updateTaskStatus(
+      req.user,
+      taskId,
+      status
+    );
+
+    res.status(200).json(updated);
+  } catch (err: any) {
+    if (err.message === 'FORBIDDEN') {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+    if (err.message === 'NOT_FOUND') {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+    throw err;
   }
+}
 
-  const isCreator = task.createdById === req.user.id;
-  const isAssignee = task.assignedToId === req.user.id;
 
-  if (
-    status === 'COMPLETED' &&
-    !(isCreator || isAssignee)
-  ) {
-    return res.status(403).json({ message: 'Not allowed' });
+export async function updateTaskDetails(req: AuthRequest, res: Response) {
+  try {
+    const taskId = Number(req.params.id);
+
+    const updated = await taskService.updateTaskDetails(
+      req.user,
+      taskId,
+      req.body
+    );
+
+    res.status(200).json(updated);
+  } catch (err: any) {
+    if (err.message === 'FORBIDDEN') {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+    if (err.message === 'NOT_FOUND') {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+    throw err;
   }
+}
 
-  if (status === 'REOPENED' && !isCreator) {
-    return res.status(403).json({ message: 'Only creator can reopen' });
+
+export async function deleteTask(req: AuthRequest, res: Response) {
+  try {
+    const taskId = Number(req.params.id);
+    await taskService.deleteTask(req.user, taskId);
+    res.status(204).send();
+  } catch (err: any) {
+    if (err.message === 'FORBIDDEN') {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+    if (err.message === 'NOT_FOUND') {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+    throw err;
   }
-
-  const updated = await prisma.task.update({
-    where: { id: taskId },
-    data: { status },
-  });
-
-  res.status(200).json(updated);
 }

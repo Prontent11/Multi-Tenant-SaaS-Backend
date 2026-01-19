@@ -17,7 +17,6 @@ export function signOrgUserToken(payload: OrgUserToken) {
   return jwt.sign(payload, JWT_SECRET as string, { expiresIn: '2h' });
 }
 
-
 export function signSuperAdminToken(payload: SuperAdminToken) {
   return jwt.sign(payload, JWT_SECRET as string, { expiresIn: '2h' });
 }

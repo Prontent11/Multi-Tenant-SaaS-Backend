@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { prisma } from '../../config/prisma';
-
+import { OrgRole } from '../../../prisma/generated/prisma';
 export async function createOrganization(name: string) {
   return prisma.organization.create({
     data: { name },
@@ -35,10 +35,11 @@ export async function createOrganizationAdmin(
 ) {
   const passwordHash = await bcrypt.hash(password, 10);
 
-  return prisma.organizationAdmin.create({
+  return prisma.user.create({
     data: {
       email,
       passwordHash,
+      role: OrgRole.ADMIN,
       organizationId,
     },
   });

@@ -18,8 +18,15 @@ app.get('/health', (_req: Request, res: Response) => {
 // Super Admin Routes 
 
 app.use('/api/super-admin', superAdminRoutes);
+
+// Org Routes 
+
 app.use('/api/org', orgAuthRoutes);
+
+//User Routes
 app.use('/api/org/users', userRoutes);
+
+//Task Routes
 app.use('/api/org/tasks', taskRoutes);
 
 
