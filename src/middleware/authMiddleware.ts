@@ -20,6 +20,7 @@ export function authenticate(
   try {
     const decoded = verifyToken(token);
     req.user = decoded;
+    console.log('Authenticated user:', decoded);
     next();
   } catch {
     return res.status(401).json({ message: 'Invalid token' });

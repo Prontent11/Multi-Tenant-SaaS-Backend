@@ -1,5 +1,6 @@
 import { prisma } from '../../config/prisma';
 import { TaskPriority,TaskStatus } from '../../../prisma/generated/prisma';
+import { sendEmail } from '../notifications/email.service';
 type OrgUser = {
   id: number;
   role: 'ADMIN' | 'MANAGER' | 'USER';
@@ -44,6 +45,7 @@ export async function createTask(
   user: OrgUser,
   input: CreateTaskInput
 ) {
+  console.log('User',user)
   if (user.role === 'USER') {
     throw new Error('FORBIDDEN');
   }
@@ -60,7 +62,7 @@ export async function createTask(
     throw new Error('INVALID_ASSIGNEE');
   }
 
-  return prisma.task.create({
+  const task = await prisma.task.create({
     data: {
       title: input.title,
       description: input.description,
@@ -71,6 +73,12 @@ export async function createTask(
       assignedToId: input.assignedToId,
     },
   });
+  //   await sendEmail(
+  //   `${task.assignedToId}`,
+  //   'New Task Assigned',
+  //   `A new task "${task.title}" has been created and assigned to you.`
+  // );
+  return task;
 }
 
 
@@ -97,10 +105,16 @@ export async function updateTaskStatus(
     throw new Error('FORBIDDEN');
   }
 
-  return prisma.task.update({
+  const data =await prisma.task.update({
     where: { id: taskId },
     data: { status },
   });
+  // await sendEmail(
+  //   `${task.assignedToId};${task.createdById}`,
+  //   `Task "${task.title}" status updated to ${status}`,
+  //   `The status of task "${task.title}" has been updated to ${status}.`
+  // );
+  return data;
 }
 
 

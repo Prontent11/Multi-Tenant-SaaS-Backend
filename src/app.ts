@@ -4,11 +4,16 @@ import cors from 'cors';
 import orgAuthRoutes from './modules/orgAuth/orgAuth.routes'
 import userRoutes from './modules/users/user.routes'
 import taskRoutes from './modules/tasks/task.routes'
+import { startTaskReminderJob } from './modules/notifications/taskReminder/taskReminderJob';
 const app: Application = express();
+
 
 //Global Middleware
 app.use(cors());
 app.use(express.json());
+
+// Task Reminder Job 
+// startTaskReminderJob();
 
 // Health Check Route 
 app.get('/health', (_req: Request, res: Response) => {
